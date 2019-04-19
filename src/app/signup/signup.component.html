@@ -1,31 +1,41 @@
-<form>
-  <div class="form-group">
-    <label for="signupEmail">Correo electrónico</label>
-    <input type="email" class="form-control" id="signupEmail" placeholder="Escribe tu correo">
+<form class="card mt-3">
+  <div class="card-body">
+    <div class="form-group">
+      <label for="signupEmail">Correo electrónico</label>
+      <input type="email" class="form-control" id="signupEmail" placeholder="Escribe tu correo">
+    </div>
+    <div class="form-group">
+      <label for="signupName">Nombre</label>
+      <input type="text" class="form-control" id="signupName" placeholder="Escribe tu nombre">
+    </div>
+    <div class="form-group">
+      <label for="signupLastName">Apellido paterno</label>
+      <input type="text" class="form-control" id="signupLastName" placeholder="Escribe tu apellido paterno">
+    </div>
+    <div class="form-group">
+      <label for="signupSecondLastName">Apellido materno</label>
+      <input type="text" class="form-control" id="signupSecondLastName" placeholder="Escribe tu apellido materno">
+    </div>
+    <div class="form-group">
+      <label for="signupUsername">Nombre de usuario</label>
+      <input type="text" class="form-control" id="signupUsername" placeholder="Escribe tu nombre de usuario">
+    </div>
+    <div class="form-group custom-icon">
+      <label for="signupPassword">{{ passText }}</label>
+      <input [type]="passwordPreviews.first ? 'password' : 'text'" class="form-control" id="signupPassword"
+        [placeholder]="passText">
+      <span class="preview-icon" (click)="passwordPreviews.first = !passwordPreviews.first">
+        <fa-icon [icon]="passwordPreviews.first ? 'eye' : 'eye-slash'"></fa-icon>
+      </span>
+    </div>
+    <div class="form-group custom-icon">
+      <label for="signupPasswordConfirm">Confirmar Contraseña</label>
+      <input [type]="passwordPreviews.confirm ? 'password' : 'text'" class="form-control" id="signupPasswordConfirm"
+        placeholder="Contraseña">
+      <span class="preview-icon" (click)="passwordPreviews.confirm = !passwordPreviews.confirm">
+        <fa-icon [icon]="getIcon(passwordPreviews.confirm)"></fa-icon>
+      </span>
+    </div>
+    <button type="submit" class="btn btn-primary btn-block" (click)="signup($event)">Registrarse</button>
   </div>
-  <div class="form-group">
-    <label for="signupName">Nombre</label>
-    <input type="text" class="form-control" id="signupName" placeholder="Escribe tu nombre">
-  </div>
-  <div class="form-group">
-    <label for="signupLastName">Apellido paterno</label>
-    <input type="text" class="form-control" id="signupLastName" placeholder="Escribe tu apellido paterno">
-  </div>
-  <div class="form-group">
-    <label for="signupSecondLastName">Apellido materno</label>
-    <input type="text" class="form-control" id="signupSecondLastName" placeholder="Escribe tu apellido materno">
-  </div>
-  <div class="form-group">
-    <label for="signupUsername">Nombre de usuario</label>
-    <input type="text" class="form-control" id="signupUsername" placeholder="Escribe tu nombre de usuario">
-  </div>
-  <div class="form-group">
-    <label for="signupPassword">Contraseña</label>
-    <input type="password" class="form-control" id="signupPassword" placeholder="Contraseña">
-  </div>
-  <div class="form-group">
-    <label for="signupPasswordConfirm">Confirmar Contraseña</label>
-    <input type="password" class="form-control" id="signupPasswordConfirm" placeholder="Contraseña">
-  </div>
-  <button type="submit" class="btn btn-primary btn-block">Registrarse</button>
 </form>
