@@ -12,8 +12,7 @@ import { CustomAlert } from '../../../models/alert';
 export class AlertModalComponent implements OnInit {
   @ViewChild('template') template: TemplateRef<any>;
   modalRef: BsModalRef;
-  modalTitle: string;
-  modalBody: string;
+  resolveFn: (value: { action: 'accept' | 'cancel' }) => void;
 
   alertInfo: CustomAlert = {
     acceptButtonText: 'Aceptar',
@@ -41,7 +40,9 @@ export class AlertModalComponent implements OnInit {
           body: '',
           title: 'Alerta!',
           type: 'success'
-        }, obj);
+        }, obj.info);
+
+        this.resolveFn = obj.resolve;
 
         this.openModal(this.template);
       });
@@ -49,6 +50,24 @@ export class AlertModalComponent implements OnInit {
 
   openModal(template: TemplateRef<any>) {
     this.modalRef = this.modalService.show(template);
+  }
+
+  closeModal() {
+    this.modalRef.hide();
+  }
+
+  accept(): void {
+    if (this.resolveFn && typeof this.resolveFn === 'function') {
+      this.resolveFn({ action: 'accept' });
+      this.closeModal();
+    }
+  }
+
+  cancel(): void {
+    if (this.resolveFn && typeof this.resolveFn === 'function') {
+      this.resolveFn({ action: 'cancel' });
+      this.closeModal();
+    }
   }
 
 }

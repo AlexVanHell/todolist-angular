@@ -9,7 +9,10 @@
     </div>
 
     <div class="row">
-      <div class="form-group col-12">
+      <div class="form-group custom-icon col-12">
+        <div class="alert alert-warning" role="alert" *ngIf="signupForm.get('email').hasError('pattern')">
+          Por favor introduce un correo electrónico válido
+        </div>
         <label for="signupEmail">
           Correo electrónico
           <span class="text-danger ml-2" *ngIf="signupForm.get('email').hasError('required') && submittedForm">Este
@@ -17,9 +20,12 @@
         </label>
         <input type="email" class="form-control" id="signupEmail" placeholder="Escribe tu correo"
           formControlName="email">
-        <div class="alert alert-warning" role="alert" *ngIf="signupForm.get('email').hasError('pattern')">
-          Por favor introduce un correo electrónico válido
-        </div>
+        <span class="preview-icon" *ngIf="signupForm.get('email').value">
+          <fa-icon icon="check" class="text-success" *ngIf="signupForm.get('email').status === 'VALID'"></fa-icon>
+          <fa-icon icon="times" class="text-danger" *ngIf="signupForm.get('email').status === 'INVALID' && signupForm.get('email').hasError('emailExists')"></fa-icon>
+          <fa-icon icon="spinner" class="text-info" [spin]="true" *ngIf="signupForm.get('email').status === 'PENDING'">
+          </fa-icon>
+        </span>
       </div>
       <div class="form-group col-12">
         <label for="signupName">
@@ -60,7 +66,8 @@
         <span class="preview-icon" *ngIf="signupForm.get('username').value">
           <fa-icon icon="check" class="text-success" *ngIf="signupForm.get('username').status === 'VALID'"></fa-icon>
           <fa-icon icon="times" class="text-danger" *ngIf="signupForm.get('username').status === 'INVALID'"></fa-icon>
-          <fa-icon icon="spinner" class="text-info" [spin]="true" *ngIf="signupForm.get('username').status === 'PENDING'"></fa-icon>
+          <fa-icon icon="spinner" class="text-info" [spin]="true"
+            *ngIf="signupForm.get('username').status === 'PENDING'"></fa-icon>
         </span>
       </div>
 

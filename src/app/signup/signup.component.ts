@@ -4,6 +4,8 @@ import { FormGroup, FormBuilder, Validators, AbstractControl, AsyncValidatorFn }
 import { AuthService } from '../shared/services/auth.service';
 import { map } from 'rxjs/operators';
 import { Observable } from 'rxjs';
+import { User } from '../models/user';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-signup',
@@ -26,11 +28,17 @@ export class SignupComponent implements OnInit {
   constructor(
     private alertService: AlertService,
     private fb: FormBuilder,
-    private authService: AuthService
+    private authService: AuthService,
+    private router: Router
   ) { }
 
   ngOnInit() {
     this.buildForm();
+
+    if (this.authService.isAuthenticated()) {
+      this.router.navigate(['/home']);
+      return;
+    }
   }
 
   buildForm() {
@@ -38,19 +46,23 @@ export class SignupComponent implements OnInit {
       firstName: ['', [Validators.required]],
       lastName: ['', [Validators.required]],
       secondLastName: ['', [Validators.required]],
-      email: ['', [Validators.required, Validators.email, Validators.pattern(/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/)]],
+      email: ['', [
+        Validators.required,
+        Validators.email,
+        Validators.pattern(/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/)
+      ], this.checkValidEmail()],
       username: ['', [Validators.required], this.checkValidUsername()],
       passwords: this.fb.group({
         psw: ['', [Validators.required]],
         confirm: ['', [Validators.required]]
       }, {
-        validator: (group: FormGroup) => {
-          let first = group.get('psw').value;
-          let confirm = group.get('confirm').value;
+          validator: (group: FormGroup) => {
+            let first = group.get('psw').value;
+            let confirm = group.get('confirm').value;
 
-          return first === confirm ? null : { notSame: true };
-        }
-      })
+            return first === confirm ? null : { notSame: true };
+          }
+        })
     });
 
     this.signupForm.valueChanges
@@ -61,13 +73,22 @@ export class SignupComponent implements OnInit {
   }
 
   checkValidUsername(): AsyncValidatorFn {
-    console.log(this.authService);
-
     return (control: AbstractControl): Observable<any> => {
       return this.authService.findUsername(control.value)
         .pipe(
           map((res: any) => {
             return res.username ? { usernameExists: true } : null;
+          })
+        )
+    }
+  }
+
+  checkValidEmail(): AsyncValidatorFn {
+    return (control: AbstractControl): Observable<any> => {
+      return this.authService.findEmail(control.value)
+        .pipe(
+          map((res: any) => {
+            return res.email ? { emailExists: true } : null;
           })
         )
     }
@@ -104,19 +125,39 @@ export class SignupComponent implements OnInit {
       title: 'Super alerta!',
       body: '¿Estás seguro de hackear la NASA?',
       cancelButton: true,
-      type: 'error'
+      type: 'success'
+    }).then((result) => {
+      let user: User = this.signupForm.value;
+
+      user.password = this.signupForm.value.passwords.psw;
+
+      if (result.action === 'accept') {
+        this.authService.signup(user)
+          .subscribe((res) => {
+            this.authService.setAuthToken(res);
+
+            this.authService.getAuth()
+              .subscribe((authUser) => {
+                this.authService.setAuthUser(authUser);
+                this.router.navigate(['/home']);
+              })
+
+            console.log(res);
+            console.log('registroExitoso');
+          }, (err) => {
+            console.log(err);
+            console.log('Registro fallido');
+
+            this.alertService.show({
+              body: err.error.message || err.message
+            });
+
+          })
+      }
+
     })
 
-    let user = this.signupForm.value;
 
-    this.authService.signup(user)
-      .subscribe((res) => {
-        console.log(res);
-        console.log('registroExitoso');
-      }, (err) => {
-        console.log(err);
-        console.log('Registro fallido');
-      })
   }
 
 }
